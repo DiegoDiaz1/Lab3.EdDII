@@ -10,10 +10,8 @@ namespace Lab03
 {
     class S_des
     {
-        //Objeto RSA
-        RSA objRSA = new RSA();
         //Objetos propios del S-des.
-        private bool[] LlavePrivada = new bool[10] {true, true, true, false, false, false, true, true, false, true };
+        private bool[] LlavePrivada;
         private bool[] LlaveA = new bool[8];
         private bool[] LlaveB = new bool[8];
         private bool[] Arreglo;
@@ -131,6 +129,16 @@ namespace Lab03
             byte[] bytes = new byte[1];
             reversed.CopyTo(bytes, 0);
             return bytes[0];
+        }
+        //Procedimmiento que cambia el valor de la llave privada (Necesaria para el híbrido).
+        public void CambiarLlave(bool[] Llave)
+        {
+            LlavePrivada = Llave;
+        }
+        //Procedimiento que obtiene la llave privada (Necesaria para el híbrido).
+        public bool[] ObtenerLlave()
+        {
+            return this.LlavePrivada;
         }
         //Procedimiento que obtiene valores para las llaves K1 y K2
         private void GeneradorLlaves()

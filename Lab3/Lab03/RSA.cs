@@ -9,7 +9,7 @@ namespace Lab03
 {
     class RSA
     {
-        private int n = 200000;//Intervalo de numeros primos
+        private int n = 1000;//Intervalo de numeros primos
         private Random newRNG= new Random();//generador de posiciones en la lista/
         private Int64 possibleCoprime;
         private int d;
