@@ -2,9 +2,10 @@
 Encryptacion DES/RSA
   1) Se obtiene una llave privada siguiendo el algoritmo RSA.
   2) Se emplea esta llave para generar las llaves K1 y K2 y realizar el cifrado S-des.
-  3) ARCHIVO DE SALIDA:
-  Llave Privada: <bits de la llave privada obtenida con RSA.>
-  Texto codificado: <Se muestra el texto cifrado.>
+  3) ARCHIVOS DE SALIDA:
+      Archivo.cif - Se muestra el texto encriptado
+      Archivo.cif.key - Archivo que contiene la llave utilizada en el archivo .cif de mismo nombre
+      Archivo.decif - Muestra el mensaje desencriptado.
   
   
 FUNCIONAMIENTO ALGORITMO S-DES
