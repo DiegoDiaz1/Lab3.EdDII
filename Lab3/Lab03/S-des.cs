@@ -13,7 +13,7 @@ namespace Lab03
         //Objeto RSA
         RSA objRSA = new RSA();
         //Objetos propios del S-des.
-        private bool[] LlavePrivada;
+        private bool[] LlavePrivada = new bool[10] {true, true, true, false, false, false, true, true, false, true };
         private bool[] LlaveA = new bool[8];
         private bool[] LlaveB = new bool[8];
         private bool[] Arreglo;
@@ -41,7 +41,7 @@ namespace Lab03
             return Salida;
         }
         //Corre los datos del arreglo hacia la izquierda
-        private void Desplazamiento(int cantidad, bool[] arreglo)
+        private void DesplazamientoIzq(int cantidad, bool[] arreglo)
         {
             bool primero = arreglo[0];
             bool segundo = arreglo[1];
@@ -93,7 +93,37 @@ namespace Lab03
             Salida[1] = Convert.ToBoolean(Convert.ToInt32(bits[1].ToString()));
             return Salida;
         }
-        //Función que transforma la salida a un arreglo de enteros
+        //Función XOR inverso
+        private bool[] XORInverso(bool[] xor, bool[] arreglo)
+        {
+            bool[] Salida = new bool[arreglo.Length];
+            for (int i = 0; i < Salida.Length; i++)
+            {
+                //Si eran diferentes
+                if (xor[i])
+                {
+                    Salida[i] = !arreglo[i];
+                }
+                //Si eran iguales
+                else
+                {
+                    Salida[i] = arreglo[i];
+                }
+            }
+            return Salida;
+        }
+        //Función que transforma un byte a un arreglo booleano.
+        private bool[] FormatoEntrada(byte parametro)
+        {
+            BitArray bits = new BitArray(new byte[] { parametro });
+            bool[] Salida = new bool[8];
+            for (int i = 0; i < Salida.Length; i++)
+            {
+                Salida[i] = bits[7-i];
+            }
+            return Salida;
+        }
+        //Función que transforma la salida a un byte.
         private byte FormatoSalida(bool[] parametro)
         {
             BitArray bits = new BitArray(parametro);
@@ -110,26 +140,31 @@ namespace Lab03
             subArregloB = new bool[5];
             Array.Copy(Arreglo, 0, SubArregloA, 0, 5);
             Array.Copy(Arreglo, 5, subArregloB, 0, 5);
-            Desplazamiento(1, SubArregloA);
-            Desplazamiento(1, subArregloB);
+            DesplazamientoIzq(1, SubArregloA);
+            DesplazamientoIzq(1, subArregloB);
             Array.Copy(SubArregloA, 0, Arreglo, 0, 5);
             Array.Copy(subArregloB, 0, Arreglo, 5, 5);
             LlaveA = Permutación(8, Arreglo);
-            Desplazamiento(2, SubArregloA);
-            Desplazamiento(2, subArregloB);
+            DesplazamientoIzq(2, SubArregloA);
+            DesplazamientoIzq(2, subArregloB);
             Array.Copy(SubArregloA, 0, Arreglo, 0, 5);
             Array.Copy(subArregloB, 0, Arreglo, 5, 5);
             LlaveB = Permutación(8, Arreglo);
         }
-        //Codificación S-des.
-        private byte Codificar(bool[] parametro)
+        //Codificación S-des o RSA/S-des según el tipo especificado.
+        public byte Codificar(byte Entrada)
         {
+            //Generar las llaves (k1 & k2)
             GeneradorLlaves();
+            //Permutación inicial
+            bool[] parametro = FormatoEntrada(Entrada);
             Arreglo = Permutación(8, parametro);
+            //Separar en dos subgrupos (A & B)
             SubArregloA = new bool[4];
             subArregloB = new bool[4];
             Array.Copy(Arreglo, 0, SubArregloA, 0, 4);
             Array.Copy(Arreglo, 4, subArregloB, 0, 4);
+            //Realizar el procedimiento con el subgrupo B
             Arreglo = ExpandirPermutar(8, subArregloB);
             Arreglo = XOR(LlaveA, Arreglo);
             subArregloC = new bool[4];
@@ -140,7 +175,9 @@ namespace Lab03
             Array.Copy(Switchbox(subArregloC, S0), 0, Arreglo, 0, 2);
             Array.Copy(Switchbox(subArregloD, S1), 0, Arreglo, 2, 2);
             Arreglo = Permutación(4, Arreglo);
+            //Realizar XOR y obtener nuevo subgrupo A
             SubArregloA = XOR(SubArregloA, Arreglo);
+            //Realizar el mismo procedimiento con el subgrupo A
             Arreglo = ExpandirPermutar(8, SubArregloA);
             Arreglo = XOR(LlaveB, Arreglo);
             Array.Copy(Arreglo, 0, subArregloC, 0, 4);
@@ -149,30 +186,56 @@ namespace Lab03
             Array.Copy(Switchbox(subArregloC, S0), 0, Arreglo, 0, 2);
             Array.Copy(Switchbox(subArregloD, S1), 0, Arreglo, 2, 2);
             Arreglo = Permutación(4, Arreglo);
+            //Realizar XOR y obtener nuevo subgrupo B
             subArregloB = XOR(subArregloB, Arreglo);
+            //Preparar la salida del encriptado.
             Arreglo = new bool[8];
             Array.Copy(subArregloB, 0, Arreglo, 0, 4);
             Array.Copy(SubArregloA, 0, Arreglo, 4, 4);
             return FormatoSalida(Permutación(8, Arreglo));
         }
-        //Menú inicial del programa.
-        public void Menú()
+        public byte Decodificar(byte Entrada)
         {
-            StreamWriter Escritor = new StreamWriter("Archivo.txt", true);
-            Console.WriteLine("Ingresar ruta del archivo");
-            byte[] Texto = File.ReadAllBytes(Console.ReadLine());
-            for (int i = 0; i < Texto.Length; i++)
-            {
-                BitArray bits = new BitArray(new byte[] { Texto[i] });
-                bool[] Entrada = new bool[8];
-                for (int j = 0; j < bits.Length; j++)
-                {
-                    Entrada[j] = bits[j];
-                }
-                byte Salida = Codificar(Entrada);
-                Escritor.Write(Convert.ToChar(Salida));
-            }
-            Escritor.Close();
+            //Generar las llaves (k1 & k2)
+            GeneradorLlaves();
+            //Permutación inversa.
+            bool[] parametro = FormatoEntrada(Entrada);
+            Arreglo = Permutación(8, parametro);
+            //Separar en dos subgrupos (B & A)
+            SubArregloA = new bool[4];
+            subArregloB = new bool[4];
+            Array.Copy(Arreglo, 0, subArregloB, 0, 4);
+            Array.Copy(Arreglo, 4, SubArregloA, 0, 4);
+            //Realizar el procedimiento con el subgrupo A
+            Arreglo = ExpandirPermutar(8, SubArregloA);
+            Arreglo = XOR(LlaveB, Arreglo);
+            subArregloC = new bool[4];
+            subArregloD = new bool[4];
+            Array.Copy(Arreglo, 0, subArregloC, 0, 4);
+            Array.Copy(Arreglo, 4, subArregloD, 0, 4);
+            Arreglo = new bool[4];
+            Array.Copy(Switchbox(subArregloC, S0), 0, Arreglo, 0, 2);
+            Array.Copy(Switchbox(subArregloD, S1), 0, Arreglo, 2, 2);
+            Arreglo = Permutación(4, Arreglo);
+            //Realizar XOR inverso y obtener subgrupoB original
+            subArregloB = XORInverso(subArregloB, Arreglo);
+            //Realizar el mismo procedimiento con el subgrupo B
+            Arreglo = ExpandirPermutar(8, subArregloB);
+            Arreglo = XOR(LlaveA, Arreglo);
+            Array.Copy(Arreglo, 0, subArregloC, 0, 4);
+            Array.Copy(Arreglo, 4, subArregloD, 0, 4);
+            Arreglo = new bool[4];
+            Array.Copy(Switchbox(subArregloC, S0), 0, Arreglo, 0, 2);
+            Array.Copy(Switchbox(subArregloD, S1), 0, Arreglo, 2, 2);
+            Arreglo = Permutación(4, Arreglo);
+            //Realizar XOR inverso y obtener subgrupoB original
+            SubArregloA = XORInverso(SubArregloA, Arreglo);
+            //Preparar la salida del desencriptado.
+            Arreglo = new bool[8];
+            Array.Copy(SubArregloA, 0, Arreglo, 0, 4);
+            Array.Copy(subArregloB, 0, Arreglo, 4, 4);
+            return FormatoSalida(Permutación(8, Arreglo));
         }
+       
     }
 }

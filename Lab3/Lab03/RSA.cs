@@ -13,7 +13,7 @@ namespace Lab03
         private Random newRNG= new Random();//generador de posiciones en la lista/
         private Int64 possibleCoprime;
         private int d;
-        
+       
         //generates a list of prime numbers
         private List<int> GetAllPrimes(){
 

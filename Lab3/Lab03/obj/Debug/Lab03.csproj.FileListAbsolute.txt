@@ -12,3 +12,10 @@ C:\Users\User_Len\source\repos\S-des\Lab03\obj\Debug\Lab03.csprojResolveAssembly
 C:\Users\User_Len\source\repos\S-des\Lab03\obj\Debug\Lab03.csproj.CoreCompileInputs.cache
 C:\Users\User_Len\source\repos\S-des\Lab03\obj\Debug\Lab03.exe
 C:\Users\User_Len\source\repos\S-des\Lab03\obj\Debug\Lab03.pdb
+C:\Users\User_Len\source\repos\Lab3\Lab03\bin\Debug\Lab03.exe.config
+C:\Users\User_Len\source\repos\Lab3\Lab03\bin\Debug\Lab03.exe
+C:\Users\User_Len\source\repos\Lab3\Lab03\bin\Debug\Lab03.pdb
+C:\Users\User_Len\source\repos\Lab3\Lab03\obj\Debug\Lab03.csprojResolveAssemblyReference.cache
+C:\Users\User_Len\source\repos\Lab3\Lab03\obj\Debug\Lab03.csproj.CoreCompileInputs.cache
+C:\Users\User_Len\source\repos\Lab3\Lab03\obj\Debug\Lab03.exe
+C:\Users\User_Len\source\repos\Lab3\Lab03\obj\Debug\Lab03.pdb
